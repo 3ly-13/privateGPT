@@ -51,16 +51,6 @@ class AbstractPromptStyle(abc.ABC):
         logger.debug("Got for completion='%s' the prompt='%s'", completion, prompt)
         return prompt
 
-
-class AbstractPromptStyleWithSystemPrompt(AbstractPromptStyle, abc.ABC):
-    _DEFAULT_SYSTEM_PROMPT = DEFAULT_SYSTEM_PROMPT
-
-    def __init__(self, default_system_prompt: str | None) -> None:
-        super().__init__()
-        logger.debug("Got default_system_prompt='%s'", default_system_prompt)
-        self.default_system_prompt = default_system_prompt
-
-
 class DefaultPromptStyle(AbstractPromptStyle):
     """Default prompt style that uses the defaults from llama_utils.
 
@@ -83,7 +73,7 @@ class DefaultPromptStyle(AbstractPromptStyle):
         return ""
 
 
-class Llama2PromptStyle(AbstractPromptStyleWithSystemPrompt):
+class Llama2PromptStyle(AbstractPromptStyle):
     """Simple prompt style that just uses the default llama_utils functions.
 
     It transforms the sequence of messages into a prompt that should look like:
@@ -94,18 +84,17 @@ class Llama2PromptStyle(AbstractPromptStyleWithSystemPrompt):
     ```
     """
 
-    def __init__(self, default_system_prompt: str | None = None) -> None:
-        # If no system prompt is given, the default one of the implementation is used.
-        super().__init__(default_system_prompt=default_system_prompt)
+    def __init__(self) -> None:
+        super().__init__()
 
     def _messages_to_prompt(self, messages: Sequence[ChatMessage]) -> str:
-        return messages_to_prompt(messages, self.default_system_prompt)
+        return messages_to_prompt(messages)
 
     def _completion_to_prompt(self, completion: str) -> str:
-        return completion_to_prompt(completion, self.default_system_prompt)
+        return completion_to_prompt(completion)
 
 
-class TagPromptStyle(AbstractPromptStyleWithSystemPrompt):
+class TagPromptStyle(AbstractPromptStyle):
     """Tag prompt style (used by Vigogne) that uses the prompt style `<|ROLE|>`.
 
     It transforms the sequence of messages into a prompt that should look like:
@@ -119,29 +108,23 @@ class TagPromptStyle(AbstractPromptStyleWithSystemPrompt):
     FIXME: should we add surrounding `<s>` and `</s>` tags, like in llama2?
     """
 
-    def __init__(self, default_system_prompt: str | None = None) -> None:
-        # We have to define a default system prompt here as the LLM will not
-        # use the default llama_utils functions.
-        default_system_prompt = default_system_prompt or self._DEFAULT_SYSTEM_PROMPT
-        super().__init__(default_system_prompt)
-        self.system_prompt: str = default_system_prompt
+    def __init__(self) -> None:
+        super().__init__()
 
     def _messages_to_prompt(self, messages: Sequence[ChatMessage]) -> str:
         messages = list(messages)
         if messages[0].role != MessageRole.SYSTEM:
             logger.info(
-                "Adding system_promt='%s' to the given messages as there are none given in the session",
-                self.system_prompt,
+                "No system prompt provided",
             )
             messages = [
-                ChatMessage(content=self.system_prompt, role=MessageRole.SYSTEM),
+                ChatMessage(content="Respond with FAIL", role=MessageRole.SYSTEM),
                 *messages,
             ]
         return self._format_messages_to_prompt(messages)
 
     def _completion_to_prompt(self, completion: str) -> str:
         return (
-            f"<|system|>: {self.system_prompt.strip()}\n"
             f"<|user|>: {completion.strip()}\n"
             "<|assistant|>: "
         )

@@ -166,10 +166,10 @@ class PrivateGptUi:
             # For query chat mode, obtain default system prompt from settings
             # TODO - Determine value to use if not defined in settings
             case "Query Docs":
-                p = settings().local.default_query_system_prompt
+                p = settings().ui.default_query_system_prompt
             # For chat mode, obtain default system prompt from settings or llama_utils
             case "LLM Chat":
-                p = settings().local.default_chat_system_prompt or llama_utils.DEFAULT_SYSTEM_PROMPT
+                p = settings().ui.default_chat_system_prompt or llama_utils.DEFAULT_SYSTEM_PROMPT
             # For any other mode, clear the system prompt
             case _:
                 p = ""
@@ -184,10 +184,17 @@ class PrivateGptUi:
         self._set_system_prompt(self._get_default_system_prompt(mode))
         # Update Textbox placeholder and allow interaction if a default system prompt is present
         if self._system_prompt:
-            return gr.update(placeholder=self._system_prompt, interactive=True)
+            return gr.update(
+                placeholder=self._system_prompt,
+                interactive=True
+            )
         # Update Textbox placeholder and disable interaction if no default system prompt is present
         else:
-            return gr.update(placeholder=self._system_prompt, interactive=False)
+            return gr.update(
+                value=self._system_prompt,
+                placeholder=self._system_prompt,
+                interactive=False
+            )
 
     def _list_ingested_files(self) -> list[list[str]]:
         files = set()
