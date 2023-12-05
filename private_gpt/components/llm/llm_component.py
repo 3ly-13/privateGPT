@@ -22,12 +22,6 @@ class LLMComponent:
         match settings.llm.mode:
             case "local":
                 from llama_index.llms import LlamaCPP
-
-                prompt_style_cls = get_prompt_style(settings.local.prompt_style)
-                prompt_style = prompt_style_cls(
-                    default_system_prompt=settings.local.default_chat_system_prompt
-                )
-
                 self.llm = LlamaCPP(
                     model_path=str(models_path / settings.local.llm_hf_model_file),
                     temperature=0.1,
@@ -38,9 +32,6 @@ class LLMComponent:
                     generate_kwargs={},
                     # All to GPU
                     model_kwargs={"n_gpu_layers": -1},
-                    # transform inputs into Llama2 format
-                    messages_to_prompt=prompt_style.messages_to_prompt,
-                    completion_to_prompt=prompt_style.completion_to_prompt,
                     verbose=True,
                 )
 

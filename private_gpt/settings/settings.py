@@ -106,23 +106,7 @@ class LocalSettings(BaseModel):
             "If `llama2` - use the llama2 prompt style from the llama_index. Based on `<s>`, `[INST]` and `<<SYS>>`.\n"
             "If `tag` - use the `tag` prompt style. It should look like `<|role|>: message`. \n"
             "`llama2` is the historic behaviour. `default` might work better with your custom models."
-        ),
-    )
-    default_chat_system_prompt: str | None = Field(
-        None,
-        description=(
-            "The default system prompt to use for the chat mode. "
-            "If none is given - use the default system prompt (from the llama_index). "
-            "Please note that the default prompt might not be the same for all prompt styles. "
-            "Also note that this is only used if the first message is not a system message. "
-        ),
-    )
-    default_query_system_prompt: str | None = Field(
-        None,
-        description=(
-            "The default system prompt to use for the query mode. "
-            # TODO - document what can be used as default query system prompt
-        ),
+        )
     )
 
 
@@ -166,6 +150,22 @@ class OpenAISettings(BaseModel):
 class UISettings(BaseModel):
     enabled: bool
     path: str
+    default_chat_system_prompt: str | None = Field(
+        None,
+        description=(
+            "The default system prompt to use for the chat mode. "
+            "If none is given - use the default system prompt (from the llama_index). "
+            "Please note that the default prompt might not be the same for all prompt styles. "
+            "Also note that this is only used if the first message is not a system message. "
+        ),
+    )
+    default_query_system_prompt: str | None = Field(
+        None,
+        description=(
+            "The default system prompt to use for the query mode. "
+            # TODO - document what can be used as default query system prompt
+        )
+    )
 
 
 class QdrantSettings(BaseModel):
