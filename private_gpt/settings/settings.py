@@ -108,19 +108,50 @@ class LocalSettings(BaseModel):
             "`llama2` is the historic behaviour. `default` might work better with your custom models."
         ),
     )
-    default_system_prompt: str | None = Field(
+    default_chat_system_prompt: str | None = Field(
         None,
         description=(
-            "The default system prompt to use for the chat engine. "
+            "The default system prompt to use for the chat mode. "
             "If none is given - use the default system prompt (from the llama_index). "
             "Please note that the default prompt might not be the same for all prompt styles. "
             "Also note that this is only used if the first message is not a system message. "
+        ),
+    )
+    default_query_system_prompt: str | None = Field(
+        None,
+        description=(
+            "The default system prompt to use for the query mode. "
+            # TODO - document what can be used as default query system prompt
         ),
     )
 
 
 class EmbeddingSettings(BaseModel):
     mode: Literal["local", "openai", "sagemaker", "mock"]
+    ingest_mode: Literal["simple", "batch", "parallel"] = Field(
+        "simple",
+        description=(
+            "The ingest mode to use for the embedding engine:\n"
+            "If `simple` - ingest files sequentially and one by one. It is the historic behaviour.\n"
+            "If `batch` - if multiple files, parse all the files in parallel, "
+            "and send them in batch to the embedding model.\n"
+            "If `parallel` - parse the files in parallel using multiple cores, and embedd them in parallel.\n"
+            "`parallel` is the fastest mode for local setup, as it parallelize IO RW in the index.\n"
+            "For modes that leverage parallelization, you can specify the number of "
+            "workers to use with `count_workers`.\n"
+        ),
+    )
+    count_workers: int = Field(
+        2,
+        description=(
+            "The number of workers to use for file ingestion.\n"
+            "In `batch` mode, this is the number of workers used to parse the files.\n"
+            "In `parallel` mode, this is the number of workers used to parse the files and embed them.\n"
+            "This is only used if `ingest_mode` is not `simple`.\n"
+            "Do not go too high with this number, as it might cause memory issues. (especially in `parallel` mode)\n"
+            "Do not set it higher than your number of threads of your CPU."
+        ),
+    )
 
 
 class SagemakerSettings(BaseModel):
