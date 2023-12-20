@@ -42,7 +42,7 @@ embedding:
 
 rag:
   #TODO - Add other rag settings (such as ingest_mode)
-  similarity_top_k: 8
+  similarity_top_k: 2
 vectorstore:
   database: qdrant
 
