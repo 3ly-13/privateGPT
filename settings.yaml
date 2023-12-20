@@ -40,12 +40,14 @@ embedding:
   mode: local
   ingest_mode: simple
 
+rag:
+  #TODO - Add other rag settings (such as ingest_mode)
+  similarity_top_k: 8
 vectorstore:
   database: qdrant
 
 qdrant:
   path: local_data/private_gpt/qdrant
-
 local:
   prompt_style: "llama2"
   llm_hf_repo_id: TheBloke/Mistral-7B-Instruct-v0.2-GGUF

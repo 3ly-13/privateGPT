@@ -134,6 +134,7 @@ class PrivateGptUi:
                 query_stream = self._chat_service.stream_chat(
                     messages=all_messages,
                     use_context=True,
+                    similarity_top_k=settings().rag.similarity_top_k
                 )
                 yield from yield_deltas(query_stream)
             case "LLM Chat":

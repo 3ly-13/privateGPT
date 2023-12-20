@@ -97,10 +97,11 @@ class ChatService:
         system_prompt: str | None = None,
         use_context: bool = False,
         context_filter: ContextFilter | None = None,
+        similarity_top_k: int = 2
     ) -> BaseChatEngine:
         if use_context:
             vector_index_retriever = self.vector_store_component.get_retriever(
-                index=self.index, context_filter=context_filter
+                index=self.index, context_filter=context_filter, similarity_top_k=similarity_top_k
             )
             return ContextChatEngine.from_defaults(
                 system_prompt=system_prompt,
@@ -121,6 +122,7 @@ class ChatService:
         messages: list[ChatMessage],
         use_context: bool = False,
         context_filter: ContextFilter | None = None,
+        similarity_top_k: int = 2
     ) -> CompletionGen:
         chat_engine_input = ChatEngineInput.from_messages(messages)
         last_message = (
@@ -141,6 +143,7 @@ class ChatService:
             system_prompt=system_prompt,
             use_context=use_context,
             context_filter=context_filter,
+            similarity_top_k=similarity_top_k
         )
         streaming_response = chat_engine.stream_chat(
             message=last_message if last_message is not None else "",
@@ -157,6 +160,7 @@ class ChatService:
         messages: list[ChatMessage],
         use_context: bool = False,
         context_filter: ContextFilter | None = None,
+        similarity_top_k: int = 2
     ) -> Completion:
         chat_engine_input = ChatEngineInput.from_messages(messages)
         last_message = (
@@ -177,6 +181,7 @@ class ChatService:
             system_prompt=system_prompt,
             use_context=use_context,
             context_filter=context_filter,
+            similarity_top_k=similarity_top_k
         )
         wrapped_response = chat_engine.chat(
             message=last_message if last_message is not None else "",

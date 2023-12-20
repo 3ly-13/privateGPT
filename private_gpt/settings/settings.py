@@ -138,6 +138,13 @@ class EmbeddingSettings(BaseModel):
     )
 
 
+class RagSettings(BaseModel):
+    similarity_top_k: int = Field(
+        2,
+        description="Similarity Top K"
+    )
+
+
 class SagemakerSettings(BaseModel):
     llm_endpoint_name: str
     embedding_endpoint_name: str
@@ -223,6 +230,7 @@ class Settings(BaseModel):
     ui: UISettings
     llm: LLMSettings
     embedding: EmbeddingSettings
+    rag: RagSettings
     local: LocalSettings
     sagemaker: SagemakerSettings
     openai: OpenAISettings
